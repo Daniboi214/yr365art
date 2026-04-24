@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>yr365art | The Historical Archive</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0f0f0f; /* Deep dark background */
+            --parchment: #f2e9d9;
+            --gold: #c5a059;
+            --ink: #1a1a1a;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at center, #1a1b1e 0%, #0f0f0f 100%);
+            color: white;
+            font-family: 'Cormorant Garamond', serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 3.5rem;
+            letter-spacing: 8px;
+            color: var(--gold);
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        /* Selector UI */
+        .selector-box {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 30px;
+            border: 1px solid rgba(197, 160, 89, 0.2);
+            border-radius: 2px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        select, button {
+            background: transparent;
+            color: white;
+            border: 1px solid var(--gold);
+            padding: 12px 25px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            margin: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select option { background: #1a1b1e; color: white; }
+
+        button:hover {
+            background: var(--gold);
+            color: var(--bg-color);
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.4);
+        }
+
+        /* The Artifact Card */
+        #artifact-card {
+            display: none; 
+            background: var(--parchment);
+            background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            color: var(--ink);
+            width: 100%;
+            max-width: 580px;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            border: 1px solid #d1c1a5;
+        }
+
+        .card-inner {
+            border: 2px solid var(--gold);
+            padding: 40px;
+            position: relative;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .archive-no {
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            color: var(--gold);
+            border-bottom: 1px solid var(--gold);
+            display: inline-block;
+            margin-bottom: 25px;
+            letter-spacing: 2px;
+        }
+
+        .event-date {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            display: block;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #555;
+        }
+
+        .event-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.4rem;
+            text-align: center;
+            line-height: 1.1;
+            margin: 10px 0 25px 0;
+            color: #000;
+            font-weight: 700;
+        }
+
+        .event-description {
+            font-size: 1.35rem;
+            line-height: 1.6; /* As requested */
+            text-align: center;
+            font-style: italic;
+            color: #333;
+        }
+
+        .stamp {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 90px;
+            height: 90px;
+            border: 3px double #8b0000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8b0000;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            transform: rotate(-15deg);
+            opacity: 0.4;
+            font-size: 0.7rem;
+            text-align: center;
+            line-height: 1.1;
+            pointer-events: none;
+        }
+
+        .actions {
+            margin-top: 40px;
+            display: none;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.2rem; }
+            .event-title { font-size: 1.8rem; }
+            #artifact-card { padding: 20px; }
+            .card-inner { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1">yr365art</h1>
+        <div class="tagline">What happened on your birthdate?</div>
+    </header>
+
+    <div class="selector-box">
+        <select id="month">
+            <option value="0">January</option><option value="1">February</option>
+            <option value="2">March</option><option value="3">April</option>
+            <option value="4">May</option><option value="5">June</option>
+            <option value="6">July</option><option value="7">August</option>
+            <option value="8">September</option><option value="9">October</option>
+            <option value="10">November</option><option value="11">December</option>
+        </select>
+        <select id="day"></select>
+        <button onclick="revealArchive()">Unveil the Past</button>
+    </div>
+
+    <div id="artifact-card">
+        <div class="card-inner">
+            <span class="archive-no">ARCH-365</span>
+            <span class="event-date" id="res-date">DATE</span>
+            <h2 class="event-title" id="res-title">TITLE</h2>
+            <p class="event-description" id="res-desc">DESCRIPTION</p>
+            <div class="stamp"><br>365 ARCHIVE</div>
+        </div>
+    </div>
+
+    <div class="actions" id="action-btns">
+        <button onclick="shareX()">Share to X</button>
+        <button onclick="downloadPNG()" style="border-color:#27ae60; color:#27ae60;">Download Artifact</button>
+    </div>
+
+   <script>
+        // 1. THIS SECTION BUILDS THE DAY DROPDOWN (1-31)
+        const dSel = document.getElementById('day');
+        for(let i=1; i<=31; i++) {
+            let o = document.createElement('option'); 
+            o.value = i; 
+            o.innerText = i; 
+            dSel.appendChild(o);
+        }
+
+        // 2. THE HISTORY ARCHIVE DATA
+        const historyArchive = {
+            // JANUARY (Month 0)
+            "0-1": { head: "The Emancipation Proclamation", body: "1863. Amidst the smoke of the American Civil War, Abraham Lincoln issued a decree that redefined the moral soul of a nation, declaring all enslaved people in rebel territories to be forever free." },
+            "0-2": { head: "The Fall of Granada", body: "1492. Muhammad XII surrendered the keys to the city, marking the end of the Reconquista and the final collapse of Moorish rule in Spain after seven centuries." },
+            "0-3": { head: "The Incorporation of Apple", body: "1977. In a quiet California suburb, a garage-born venture was officially incorporated. It was the birth of a tech titan that would eventually revolutionize how humanity communicates." },
+            "0-4": { head: "The Birth of Isaac Newton", body: "1643. One of history's greatest intellects entered the world. His later work on gravity, motion, and light would build the foundation of modern physics." },
+            "0-5": { head: "The Golden Gate Bridge", body: "1933. Construction began on a project many called impossible. Spanning the treacherous waters of the Golden Gate, this marvel became a global icon of human engineering." },
+            "0-6": { head: "The Last Saxon King", body: "1066. Harold Godwinson was crowned King of England. It was a reign destined for tragedy, ending months later at the Battle of Hastings." },
+            "0-7": { head: "Galileo’s Cosmic Revelation", body: "1610. Peering through a primitive glass lens, Galileo Galilei discovered the moons of Jupiter, proving that not every celestial body revolved around the Earth." },
+            "0-8": { head: "The Battle of New Orleans", body: "1815. In a final, bloody clash of the War of 1812, Andrew Jackson’s forces repelled a British assault, unaware that a peace treaty had already been signed." },
+            "0-9": { head: "The First Modern Circus", body: "1768. Philip Astley staged a performance in London that combined equestrian feats with clowns, creating the blueprint for the modern circus." },
+            "0-10": { head: "The League of Nations", body: "1920. Born from the ashes of the Great War, the League of Nations was formally established as humanity’s first attempt at a global organization for peace." },
+            "0-11": { head: "The Miracle of Insulin", body: "1922. A 14-year-old boy in Toronto became the first human to receive an insulin injection, turning a once-deadly diagnosis into a manageable condition." },
+            "0-12": { head: "The Eiffel Tower’s Voice", body: "1908. A radio message was transmitted from the top of the Eiffel Tower for the first time, signaling the dawn of the global communication age." },
+            "0-13": { head: "The Power of the Pen", body: "1898. Émile Zola published 'J’Accuse,' a blistering exposure of government corruption that redefined the role of the intellectual in society." },
+            "0-14": { head: "American Sovereignty Ratified", body: "1784. The Continental Congress ratified the Treaty of Paris, officially ending the Revolutionary War and recognizing the US as an independent nation." },
+            "0-15": { head: "The British Museum Opens", body: "1759. One of the world's greatest storehouses of human achievement opened its doors, offering free access to the shared heritage of global civilizations." },
+            "0-16": { head: "The Storm Clouds of War", body: "1991. The sky over Baghdad ignited as the US-led coalition launched Operation Desert Storm, the first high-tech televised conflict of the modern era." },
+            "0-17": { head: "The Liberation of Warsaw", body: "1945. After years of brutal occupation, Soviet and Polish forces finally broke the Nazi hold on the city during the closing chapters of WWII." },
+            "0-18": { head: "The Versailles Conference", body: "1919. World leaders gathered in the Hall of Mirrors to redraw the map of the world after World War I, setting the stage for the century to come." },
+            "0-19": { head: "The First Aerial Raid", body: "1915. German Zeppelins carried out the first major aerial bombing of Great Britain, bringing the front lines of war into the homes of civilians." },
+            "0-20": { head: "A New Frontier for America", body: "1961. John F. Kennedy was inaugurated. His speech—'Ask not what your country can do for you'—galvanized a generation for the mission to the moon." },
+            "0-21": { head: "The Death of a Monarchy", body: "1793. King Louis XVI of France was executed by guillotine in Paris, signaling the end of the Divine Right of Kings and the peak of the Revolution." },
+            "0-22": { head: "The End of the Victorian Age", body: "1901. After 63 years on the throne, Queen Victoria passed away, ending an epoch of industrial expansion and global power." },
+            "0-23": { head: "The Shaanxi Catastrophe", body: "1556. A massive earthquake struck China, remaining the deadliest seismic event in history, claiming an estimated 830,000 lives in one morning." },
+            "0-24": { head: "The California Gold Rush", body: "1848. James W. Marshall found gold at Sutter’s Mill, triggering a global migration that transformed the American West into a booming economic engine." },
+            "0-25": { head: "The First Winter Olympics", body: "1924. The 'International Winter Sports Week' opened in the French Alps, retroactively becoming the first-ever Winter Olympic Games." },
+            "0-26": { head: "The First Fleet Arrives", body: "1788. Captain Arthur Phillip led the British First Fleet into Sydney Cove, establishing the first European settlement in Australia." },
+            "0-27": { head: "The Liberation of Auschwitz", body: "1945. Soldiers of the Red Army entered the gates of Auschwitz-Birkenau, forcing the world to confront the horrifying reality of the Holocaust." },
+            "0-28": { head: "The Challenger Tragedy", body: "1986. Seventy-three seconds into its flight, the Space Shuttle Challenger disintegrated, a heartbreaking reminder of the risks of space exploration." },
+            "0-29": { head: "The Birth of the Automobile", body: "1886. Karl Benz applied for a patent for his 'vehicle powered by a gas engine,' the official birth certificate of the modern internal combustion car." },
+            "0-30": { head: "The Passing of a Great Soul", body: "1948. Mahatma Gandhi, the champion of non-violent resistance, was assassinated in Delhi, leaving a legacy that still inspires civil rights movements." },
+            "0-31": { head: "The Launch of Explorer 1", body: "1958. In response to Sputnik, the United States successfully launched its first satellite, discovering the Van Allen radiation belts." },
+
+            // FEBRUARY (Month 1)
+            "1-1": { head: "The Abolition of Slavery", body: "1865. President Abraham Lincoln signed the 13th Amendment, a legislative masterstroke that constitutionally abolished slavery in the United States, forever altering the nation's moral trajectory." },
+            "1-2": { head: "The End of Stalingrad", body: "1943. After five months of grueling urban warfare, the German 6th Army surrendered at Stalingrad. It was the decisive turning point of WWII and the beginning of the end for the Axis powers." },
+            "1-3": { head: "A Soft Touch on the Moon", body: "1966. The Soviet Union's Luna 9 became the first spacecraft to achieve a soft landing on the lunar surface, proving the Moon's dust was solid enough to support future human exploration." },
+            "1-4": { head: "The Birth of the Social Era", body: "2004. From a dorm room at Harvard, 'TheFacebook' was launched. What began as a local networking tool would grow into a global titan, fundamentally rewriting the rules of human connection." },
+            "1-5": { head: "The Premiere of 'Modern Times'", body: "1936. Charlie Chaplin's masterpiece premiered in New York. A biting, hilarious critique of the industrial age, it remains one of the most influential films in cinema history." },
+            "1-6": { head: "The Accession of Elizabeth II", body: "1952. Princess Elizabeth received word of her father's death while in Kenya. On this day, she ascended the throne, beginning a historic 70-year reign that spanned a century of global change." },
+            "1-7": { head: "The British Invasion Begins", body: "1964. Pan Am Flight 101 touched down in New York carrying the Beatles. Thousands of screaming fans signaled the start of 'Beatlemania' and a seismic shift in global pop culture." },
+            "1-8": { head: "The Russo-Japanese War", body: "1904. With a surprise attack on the Russian fleet at Port Arthur, Japan launched a conflict that marked the first time a modern Asian power defeated a major European empire." },
+            "1-9": { head: "The Queen of the Skies", body: "1969. The Boeing 747, the world's first 'Jumbo Jet,' took to the air for its maiden flight. It revolutionized travel, making the world significantly more accessible to the masses." },
+            "1-10": { head: "The Treaty of Paris", body: "1763. The signing of this treaty ended the Seven Years' War. It dramatically redrew the map of the world, making Great Britain the dominant colonial power in North America." },
+            "1-11": { head: "Mandela Walks Free", body: "1990. After 27 years of imprisonment, Nelson Mandela walked through the gates of Victor Verster Prison, signaling the inevitable collapse of Apartheid and a new dawn for South Africa." },
+            "1-12": { head: "The Birth of Evolution", body: "1809. Charles Darwin was born. His later theory of natural selection would shatter the traditional understanding of the natural world and forever change how humanity views its origins." },
+            "1-13": { head: "The Firestorm of Dresden", body: "1945. Allied forces began a massive, controversial firebombing campaign on the German city of Dresden. The resulting firestorm remains one of the most debated actions of World War II." },
+            "1-14": { head: "The Dawn of Computing", body: "1946. ENIAC, the world's first general-purpose electronic computer, was unveiled. A 30-ton behemoth of vacuum tubes and wires, it signaled the birth of the Information Age." },
+            "1-15": { head: "The Sinking of the Maine", body: "1898. A massive explosion destroyed the USS Maine in Havana Harbor. The tragedy killed 260 sailors and became the rallying cry that propelled the United States into the Spanish-American War." },
+            "1-16": { head: "The Tomb of the Boy King", body: "1923. Archaeologist Howard Carter broke the seal on the burial chamber of Tutankhamun. The discovery of the virtually intact tomb sparked a global obsession with Ancient Egypt." },
+            "1-17": { head: "The Peaceful Transfer of Power", body: "1801. After a deadlocked election, the US House of Representatives chose Thomas Jefferson as President. It was a landmark victory for the young Republic's democratic process." },
+            "1-18": { head: "The Discovery of Pluto", body: "1930. Examining photographic plates at the Lowell Observatory, Clyde Tombaugh discovered the remote ninth planet, expanding our map of the deep cosmic neighborhood." },
+            "1-19": { head: "Executive Order 9066", body: "1942. In the wake of Pearl Harbor, President Roosevelt signed an order leading to the forced internment of 120,000 Japanese-Americans, a significant civil rights violation." },
+            "1-20": { head: "Friendship 7 Orbits Earth", body: "1962. John Glenn became the first American to orbit the Earth. His successful mission restored national pride and proved the United States was a true contender in the Space Race." },
+            "1-21": { head: "The Communist Manifesto", body: "1848. Karl Marx and Friedrich Engels published their political pamphlet in London, inspiring movements that would define the global geopolitics of the 20th century." },
+            "1-22": { head: "The First President's Birth", body: "1732. George Washington was born in Virginia. As the commander of the Continental Army and the first US President, his leadership defined the very nature of the American republic." },
+            "1-23": { head: "Flag Raising on Iwo Jima", body: "1945. During one of the bloodiest battles of the Pacific, six men raised the American flag atop Mount Suribachi. The moment became the most iconic photograph of World War II." },
+            "1-24": { head: "The Gregorian Calendar", body: "1582. Pope Gregory XIII issued a decree introducing the Gregorian Calendar. By skipping ten days, it fixed the 'drifting' of the seasons and eventually became the global standard." },
+            "1-25": { head: "The Birth of a Legend", body: "1964. A young Cassius Clay stunned the boxing world by defeating the 'invincible' Sonny Liston. It was the birth of a legend who would become Muhammad Ali, 'The Greatest'." },
+            "1-26": { head: "The WTC Bombing", body: "1993. A truck bomb was detonated in the underground garage of the World Trade Center's North Tower, a terrifying precursor to the new age of international terrorism." },
+            "1-27": { head: "The Reichstag Fire", body: "1933. The German parliament building was set ablaze. The event was immediately used by the Nazi leadership to suspend civil liberties and consolidate total control over the state." },
+            "1-28": { head: "The Secret of Life", body: "1953. At a pub in Cambridge, Francis Crick and James Watson announced they had discovered the chemical structure of DNA—the double helix blueprint for all living things." },
+            "1-29": { head: "The Leap Year Miracle", body: "Throughout history, this 'extra' day has balanced the calendar. In 1504, Columbus famously used a predicted lunar eclipse on this date to subdue local populations in Jamaica." },
+
+            // MARCH (Month 2)
+            "2-1": { head: "The Thermonuclear Age", body: "1954. The United States detonated 'Castle Bravo' at Bikini Atoll. It was the most powerful nuclear device ever tested by the US, a terrifying 15-megaton blast that signaled the true dawn of the hydrogen bomb era." },
+            "2-2": { head: "The Concorde Takes Flight", body: "1969. The supersonic airliner Concorde made its maiden flight in France. It was a masterpiece of aerospace engineering that allowed travelers to cross the Atlantic faster than the speed of sound." },
+            "2-3": { head: "The Architect of Sound", body: "1847. Alexander Graham Bell was born. A visionary inventor and scientist, his lifelong fascination with the human voice led to the creation of the telephone and the foundation of modern telecommunications." },
+            "2-4": { head: "The First Inauguration", body: "1789. The first Congress under the new United States Constitution met in New York City. It was the formal beginning of the American federal government and a landmark moment for modern democracy." },
+            "2-5": { head: "The Iron Curtain Descends", body: "1946. In a speech in Missouri, Winston Churchill declared that an 'Iron Curtain' had fallen across Europe. It was the moment the world realized the uneasy alliance of WWII had shattered into the Cold War." },
+            "2-6": { head: "The Fall of the Alamo", body: "1836. After a 13-day siege, Mexican forces overran the Alamo mission. The deaths of Davy Crockett and Jim Bowie became a rallying cry—'Remember the Alamo'—that fueled the fight for Texan independence." },
+            "2-7": { head: "The Patent of the Century", body: "1876. Alexander Graham Bell was granted a patent for an apparatus for transmitting vocal or other sounds telegraphically. It is considered one of the most valuable patents in human history." },
+            "2-8": { head: "The Rise of International Women's Day", body: "1917. In the midst of WWI, women in Petrograd went on strike for 'Bread and Peace.' This act helped spark the Russian Revolution and solidified March 8th as a global day of advocacy for women's rights." },
+            "2-9": { head: "The Clash of the Ironclads", body: "1862. The USS Monitor and CSS Virginia fought to a standstill in the Battle of Hampton Roads. It was the first battle between iron-armored ships, instantly making every wooden navy in the world obsolete." },
+            "2-10": { head: "The First Telephone Call", body: "1876. Three days after receiving his patent, Bell successfully transmitted the first intelligible speech to his assistant: 'Mr. Watson, come here, I want to see you.'" },
+            "2-11": { head: "The Great Pandemic Begins", body: "1918. A mess cook at Camp Funston, Kansas, reported to the infirmary with a fever. It was the first recorded case of the Spanish Flu, a pandemic that would eventually infect a third of the global population." },
+            "2-12": { head: "The Birth of the Web", body: "1989. Tim Berners-Lee submitted a proposal for 'Information Management' at CERN. It was the blueprint for the World Wide Web, the tool that would weave the entire human species into a single digital fabric." },
+            "2-13": { head: "The Discovery of Uranus", body: "1781. Astronomer William Herschel, using a home-built telescope, noticed a strange object in the sky. He had discovered Uranus, the first planet found since antiquity, doubling the known size of the solar system." },
+            "2-14": { head: "The Genius of Relativity", body: "1879. Albert Einstein was born. His theories on space, time, and gravity would dismantle the Newtonian universe and provide the fundamental equations for modern physics and the atomic age." },
+            "2-15": { head: "The Ides of March", body: "44 BC. Julius Caesar was assassinated in the Roman Senate by a group of conspirators. The act, intended to save the Republic, instead triggered a series of civil wars that gave birth to the Roman Empire." },
+            "2-16": { head: "The Birth of Liquid Rocketry", body: "1926. Robert Goddard launched the world's first liquid-fueled rocket in Massachusetts. Though it flew for only 2.5 seconds, it was the direct ancestor of the Saturn V that took humans to the moon." },
+            "2-17": { head: "The Unification of Italy", body: "1861. Victor Emmanuel II was proclaimed King of Italy. This marked the 'Risorgimento,' the political and social movement that consolidated the different states of the Italian peninsula into a single nation." },
+            "2-18": { head: "The First Spacewalk", body: "1965. Soviet cosmonaut Alexei Leonov exited his spacecraft for 12 minutes while in orbit. Floating 300 miles above the Earth, he became the first human to ever walk in the open vacuum of space." },
+            "2-19": { head: "The Invasion of Iraq", body: "2003. A coalition led by the United States launched a massive 'shock and awe' campaign against Baghdad. It was the start of a conflict that would reshape the modern Middle East for decades." },
+            "2-20": { head: "Uncle Tom's Cabin", body: "1852. Harriet Beecher Stowe's anti-slavery novel was published. It became a global bestseller, humanizing the plight of enslaved people and fueling the abolitionist fires that led to the American Civil War." },
+            "2-21": { head: "The Selma to Montgomery March", body: "1965. Led by Dr. Martin Luther King Jr., thousands of non-violent protesters began a 54-mile march for voting rights. The courage shown on this road led directly to the passage of the Voting Rights Act." },
+            "2-22": { head: "The Invention of the Laser", body: "1960. Arthur Schawlow and Charles Townes were granted a patent for the 'maser,' the precursor to the laser. Today, this technology powers everything from surgery to global fiber-optic internet." },
+            "2-23": { head: "Give Me Liberty or Death", body: "1775. Patrick Henry delivered his soul-stirring speech to the Virginia Convention. His defiance galvanized the colonies to take up arms against the British, making revolution inevitable." },
+            "2-24": { head: "The Discovery of Tuberculosis", body: "1882. Robert Koch announced the discovery of the bacterium that causes TB. At the time, the disease killed one out of every seven people; his work laid the foundation for modern microbiology." },
+            "2-25": { head: "The Triangle Fire", body: "1911. A fire broke out at the Triangle Shirtwaist Factory in New York, killing 146 workers. The tragedy led to a massive overhaul of labor laws and factory safety standards across the world." },
+            "2-26": { head: "The Salk Vaccine", body: "1953. Dr. Jonas Salk announced the successful testing of a vaccine against polio. It was a triumph of medical science that effectively ended a centuries-old plague of paralysis." },
+            "2-27": { head: "The Great Alaska Earthquake", body: "1964. A massive 9.2 magnitude earthquake—the most powerful ever recorded in North America—struck Alaska. The event permanently altered the local landscape and improved our understanding of plate tectonics." },
+            "2-28": { head: "The Three Mile Island Crisis", body: "1979. A partial meltdown occurred at a nuclear power plant in Pennsylvania. It was the most significant accident in US commercial nuclear power history, leading to sweeping changes in plant safety." },
+            "2-29": { head: "The Discovery of the Terracotta Army", body: "1974. Farmers digging a well in China stumbled upon an underground vault. They had found the 8,000-strong Terracotta Army, buried for over 2,000 years to guard the first Emperor of China." },
+            "2-30": { head: "The Alaska Purchase", body: "1867. The United States agreed to purchase Alaska from Russia for $7.2 million—roughly two cents an acre. Initially called 'Seward's Folly,' it turned out to be one of history's greatest real estate deals." },
+            "2-31": { head: "The Eiffel Tower Opens", body: "1889. The Eiffel Tower was officially inaugurated in Paris for the World's Fair. Despite being called an 'eyesore' by artists of the time, it became the tallest structure in the world and the icon of France." },
+
+            // APRIL (Month 3)
+            "3-1": { head: "The Birth of a Tech Empire", body: "1976. In a suburban garage, Steve Jobs, Steve Wozniak, and Ronald Wayne signed a partnership agreement to form Apple Computer. It was the spark that would eventually ignite the personal computing revolution and reshape modern life." },
+            "3-2": { head: "The Sun Captured in Silver", body: "1845. Physicists Leon Foucault and Louis Fizeau took the first-ever successful photograph of the Sun. This early daguerreotype allowed scientists to study the solar surface in a way that had been impossible for millennia." },
+            "3-3": { head: "The First Cellular Call", body: "1973. On a street corner in New York, Martin Cooper of Motorola placed the first handheld mobile phone call to his rivals at Bell Labs. It was a move that signaled the eventual death of the tethered telephone." },
+            "3-4": { head: "The Loss of a Dreamer", body: "1968. Dr. Martin Luther King Jr. was assassinated in Memphis. The death of the civil rights icon triggered a wave of national mourning and riots, solidifying his legacy as the moral heart of the American struggle for equality." },
+            "3-5": { head: "The End of an Era for Grunge", body: "1994. Kurt Cobain, the reluctant voice of a generation and leader of Nirvana, passed away. His death marked a tragic conclusion to the grunge movement and left an indelible mark on the history of rock and roll." },
+            "3-6": { head: "The Rebirth of the Olympics", body: "1896. After being suppressed for 1,500 years, the Olympic Games were reborn in Athens. Highlighting the spirit of international competition, the event laid the groundwork for the modern global sports phenomenon." },
+            "3-7": { head: "The Foundation of the WHO", body: "1948. The World Health Organization was established as a specialized agency of the United Nations. Its creation marked a historic commitment to global health, aiming to ensure the highest possible level of wellbeing for all." },
+            "3-8": { head: "The King of Home Runs", body: "1974. Hank Aaron hit his 715th career home run, breaking Babe Ruth's legendary record. In the face of intense racial hostility, Aaron's triumph became a landmark moment in the history of sports and civil rights." },
+            "3-9": { head: "The Surrender at Appomattox", body: "1865. General Robert E. Lee surrendered the Army of Northern Virginia to Ulysses S. Grant. This meeting effectively ended the American Civil War, the bloodiest conflict in the nation’s history." },
+            "3-10": { head: "The Titanic Sets Sail", body: "1912. The RMS Titanic, the largest and most luxurious ocean liner ever built, departed Southampton on her maiden voyage. The world watched in awe, unaware that the 'unsinkable' ship was steaming toward a tragic destiny." },
+            "3-11": { head: "The Launch of Apollo 13", body: "1970. NASA launched its third mission intended to land on the Moon. What began as a routine flight would soon transform into the most famous rescue mission in space history following a catastrophic oxygen tank explosion." },
+            "3-12": { head: "The First Human in Orbit", body: "1961. Soviet cosmonaut Yuri Gagarin became the first human to travel into space. Inside the Vostok 1, he completed a single orbit of the Earth, forever changing the human relationship with the cosmos." },
+            "3-13": { head: "The Birth of a Founder", body: "1743. Thomas Jefferson was born. As the principal author of the Declaration of Independence and the third US President, his philosophical ideals regarding liberty and self-governance shaped the American identity." },
+            "3-14": { head: "The Tragedy at Ford's Theatre", body: "1865. Just days after the end of the Civil War, Abraham Lincoln was shot by John Wilkes Booth while attending a play. He was the first American president to be assassinated, a loss that stunned a healing nation." },
+            "3-15": { head: "The Sinking of the Titanic", body: "1912. In the early morning hours, the Titanic foundered after striking an iceberg in the North Atlantic. Over 1,500 lives were lost, a catastrophe that prompted a total overhaul of maritime safety regulations." },
+            "3-16": { head: "The Birth of the Renaissance Man", body: "1452. Leonardo da Vinci was born. A master of art, science, and engineering, his notebooks and masterpieces like the Mona Lisa remain the ultimate symbol of the boundless potential of the human mind." },
+            "3-17": { head: "The Bay of Pigs Invasion", body: "1961. A CIA-backed group of Cuban exiles landed at the Bay of Pigs in an attempt to overthrow Fidel Castro. The mission's failure became a major embarrassment for the US and intensified the Cold War." },
+            "3-18": { head: "The Great San Francisco Earthquake", body: "1906. A massive earthquake and subsequent fires devastated San Francisco. It remains one of the worst natural disasters in US history, leading to significant advancements in seismology and urban planning." },
+            "3-19": { head: "The Shot Heard 'Round the World", body: "1775. The American Revolutionary War began at the Battles of Lexington and Concord. This clash between colonial minutemen and British 'redcoats' set the stage for the birth of a new republic." },
+            "3-20": { head: "The Deepwater Horizon Disaster", body: "2010. An explosion on the Deepwater Horizon oil rig triggered the largest marine oil spill in history. The environmental catastrophe in the Gulf of Mexico led to a massive rethink of offshore drilling safety." },
+            "3-21": { head: "The Founding of Rome", body: "753 BC. According to legend, Romulus founded the city of Rome on the Palatine Hill. From these humble beginnings grew one of the most powerful and influential empires the world has ever known." },
+            "3-22": { head: "The First Earth Day", body: "1970. Millions of people across the United States took to the streets to demonstrate for a healthy, sustainable environment. This event launched the modern environmental movement and led to the creation of the EPA." },
+            "3-23": { head: "The Bard of Avon", body: "1564. William Shakespeare was born (and would also die on this day in 1616). His plays and sonnets redefined the English language and remain the most performed works in the history of world theater." },
+            "3-24": { head: "The Eye in the Sky", body: "1990. The Hubble Space Telescope was launched into orbit. Despite an initial mirror flaw, it would go on to provide the most breathtaking and scientifically significant images of the deep universe ever captured." },
+            "3-25": { head: "The Blueprint of Life Published", body: "1953. Watson and Crick’s groundbreaking paper describing the double-helix structure of DNA was published in Nature. This discovery unlocked the fundamental code that governs all biological life on Earth." },
+            "3-26": { head: "The Chernobyl Catastrophe", body: "1986. A reactor at the Chernobyl Nuclear Power Plant in Ukraine exploded, releasing a massive cloud of radioactive particles. It remains the most disastrous nuclear power plant accident in history." },
+            "3-27": { head: "The Death of Magellan", body: "1521. Explorer Ferdinand Magellan was killed in a battle in the Philippines. Although he did not survive, his expedition eventually completed the first circumnavigation of the globe." },
+            "3-28": { head: "Mutiny on the Bounty", body: "1789. Master's mate Fletcher Christian led a mutiny against Captain William Bligh in the South Pacific. The legendary tale of rebellion and survival has captivated the public imagination for centuries." },
+            "3-29": { head: "The Liberation of Dachau", body: "1945. Allied forces liberated the Dachau concentration camp, the first and longest-running camp established by the Nazi regime. The world was confronted with the organized cruelty of the Holocaust." },
+            "3-30": { head: "The First Inauguration of Washington", body: "1789. On the balcony of Federal Hall in New York City, George Washington took the oath of office as the first President of the United States, setting the precedent for the American executive." },
+
+            // MAY (Month 4)
+            "4-1": { head: "The Empire State Opens", body: "1931. In the heart of the Great Depression, the Empire State Building was officially opened in New York City. Standing as the tallest building in the world for 40 years, it became the ultimate symbol of American industrial might and Art Deco elegance." },
+            "4-2": { head: "The Fall of Berlin", body: "1945. Following a massive and bloody offensive, the Soviet Union captured Berlin. This event signaled the total collapse of the Nazi regime and the effective end of World War II on the European continent." },
+            "4-3": { head: "The First PC Email", body: "1978. Gary Thuerk sent the first unsolicited mass email to 400 people on ARPANET. While it was intended as a marketing tool, it was the birth of 'spam' and a new era of digital communication." },
+            "4-4": { head: "The Birth of the Iron Lady", body: "1979. Margaret Thatcher was sworn in as the first female Prime Minister of the United Kingdom. Her conservative policies and 'Iron Lady' persona would fundamentally reshape the British economy and the Cold War landscape." },
+            "4-5": { head: "The Death of Napoleon", body: "1821. Napoleon Bonaparte, the emperor who conquered much of Europe and redefined modern law with the Napoleonic Code, passed away in exile on the remote island of Saint Helena." },
+            "4-6": { head: "The Hindenburg Disaster", body: "1937. The German airship Hindenburg burst into flames while docking in New Jersey. The catastrophe, captured on film and radio, brought a terrifying and abrupt end to the era of passenger zeppelins." },
+            "4-7": { head: "The Sinking of the Lusitania", body: "1915. A German U-boat torpedoed the British ocean liner Lusitania. The deaths of nearly 1,200 civilians, including 128 Americans, turned global opinion against Germany and pulled the US closer to World War I." },
+            "4-8": { head: "Victory in Europe Day", body: "1945. V-E Day. Nazi Germany signed an unconditional surrender, ending years of unprecedented horror and conflict in Europe. Millions took to the streets across the globe to celebrate the restoration of peace." },
+            "4-9": { head: "The Birth of a Modern Legend", body: "1960. The Food and Drug Administration (FDA) approved the first oral contraceptive pill. It was a medical milestone that triggered a social revolution, fundamentally changing women's lives and reproductive rights." },
+            "4-10": { head: "Mandela's Inauguration", body: "1994. After decades of struggle and 27 years in prison, Nelson Mandela was inaugurated as South Africa's first black president. It was the final, triumphant blow to the system of Apartheid." },
+            "4-11": { head: "The Deep Blue Victory", body: "1997. In a landmark moment for Artificial Intelligence, IBM’s Deep Blue defeated world chess champion Garry Kasparov. It was the first time a computer had beaten a reigning champion in a formal match." },
+            "4-12": { head: "The First Flight over the North Pole", body: "1926. Roald Amundsen and his crew successfully flew the airship Norge over the North Pole. It was a triumph of polar exploration that mapped one of the last great frontiers of the Earth." },
+            "4-13": { head: "Blood, Toil, Tears, and Sweat", body: "1940. Winston Churchill delivered his first speech as Prime Minister to the House of Commons. His defiant promise to fight at all costs galvanized the British people during their darkest hour." },
+            "4-14": { head: "The Birth of Israel", body: "1948. David Ben-Gurion read the Declaration of Independence, establishing the State of Israel. The event fulfilled a long-held Zionist dream but also ignited decades of complex conflict in the Middle East." },
+            "4-15": { head: "The Premiere of Mickey Mouse", body: "1928. Mickey Mouse made his first appearance in the silent short film 'Plane Crazy.' While 'Steamboat Willie' later made him a star, this was the secret birth of a global cultural icon." },
+            "4-16": { head: "The First Academy Awards", body: "1929. The first Oscars were handed out at a private dinner in the Hollywood Roosevelt Hotel. What began as a small industry gathering would grow into the world's most prestigious celebration of cinema." },
+            "4-17": { head: "The Brown v. Board Ruling", body: "1954. The US Supreme Court ruled unanimously that racial segregation in public schools was unconstitutional. This historic decision dismantled the 'separate but equal' doctrine and fueled the Civil Rights Movement." },
+            "4-18": { head: "The Eruption of Mount St. Helens", body: "1980. After months of tremors, Mount St. Helens in Washington exploded with the force of 24 megatons. It was the deadliest and most economically destructive volcanic event in United States history." },
+            "4-19": { head: "The Execution of Anne Boleyn", body: "1536. Anne Boleyn, the second wife of King Henry VIII, was executed on charges of treason and adultery. Her death paved the way for the English Reformation and the eventual reign of Elizabeth I." },
+            "4-20": { head: "The Lindbergh Flight", body: "1927. Charles Lindbergh took off from New York in the 'Spirit of St. Louis.' Thirty-three hours later, he landed in Paris, completing the first solo non-stop transatlantic flight and becoming an instant global hero." },
+            "4-21": { head: "The Manchester Baby", body: "1948. The world's first stored-program computer, nicknamed 'Baby,' successfully ran its first program. It was the critical ancestor to every smartphone and laptop in existence today." },
+            "4-22": { head: "The Wars of the Roses End", body: "1455. The First Battle of St Albans took place, marking the beginning of the Wars of the Roses. This bloody struggle for the English throne would last for thirty years and inspired the 'Game of Thrones' saga." },
+            "4-23": { head: "The Capture of Captain Kidd", body: "1699. The notorious pirate William Kidd was arrested in Boston. His trial and execution in London fueled legends of buried treasure that still captivate treasure hunters today." },
+            "4-24": { head: "The Brooklyn Bridge Opens", body: "1883. After 14 years of construction and the loss of its original designer, the Brooklyn Bridge was opened. At the time, it was the longest suspension bridge in the world and a masterpiece of steel engineering." },
+            "4-25": { head: "The Star Wars Premiere", body: "1977. George Lucas’s 'Star Wars' opened in a handful of theaters. It was a cinematic 'Big Bang' that redefined the blockbuster and created a modern mythology for the entire world." },
+            "4-26": { head: "The Dunkirk Evacuation", body: "1940. Operation Dynamo began as hundreds of civilian 'little ships' joined the Navy to rescue 338,000 Allied soldiers trapped on the beaches of France. It was a 'miracle' that saved the British Army." },
+            "4-27": { head: "The Golden Gate Opens", body: "1937. San Francisco’s Golden Gate Bridge was opened to pedestrians. An engineering feat that many said could never be built, it remains the most photographed bridge in the world." },
+            "4-28": { head: "The Sierra Leone Independence", body: "1961. Sierra Leone gained its independence from the United Kingdom, marking another major step in the decolonization of Africa and the birth of a new sovereign nation." },
+            "4-29": { head: "The Conquest of Everest", body: "1953. Sir Edmund Hillary and Tenzing Norgay became the first humans to stand on the summit of Mount Everest. News of the feat reached London just in time for the coronation of Queen Elizabeth II." },
+            "4-30": { head: "The Death of Joan of Arc", body: "1431. After leading the French army to several key victories, 19-year-old Joan of Arc was burned at the stake by the English. She was later canonized as a saint and a symbol of French resistance." },
+            "4-31": { head: "The First World Cup", body: "1930. The first FIFA World Cup concluded in Uruguay. The host nation defeated Argentina to become the first global champions of the world's most popular sport." },
+
+            // JUNE (Month 5)
+            "5-1": { head: "The Birth of a Global Icon", body: "1926. Marilyn Monroe was born in Los Angeles. Beyond the Hollywood glamour, she became a definitive cultural phenomenon of the 20th century, her image and legacy enduring as the ultimate symbol of the golden age of cinema." },
+            "5-2": { head: "The Coronation of Elizabeth II", body: "1953. In the first major international event to be broadcast live on television, Queen Elizabeth II was crowned at Westminster Abbey. The ceremony signaled a new, modern era for the British monarchy in a rapidly changing world." },
+            "5-3": { head: "America’s First Spacewalk", body: "1965. During the Gemini 4 mission, astronaut Ed White stepped out of his capsule and floated in the void for 23 minutes. It was the moment the United States proved it could match the Soviet Union in the extra-vehicular arena." },
+            "5-4": { head: "The Tiananmen Square Crackdown", body: "1989. After weeks of peaceful protests, the Chinese military moved into Beijing to clear Tiananmen Square. The image of a lone protester standing before a line of tanks became an eternal symbol of individual resistance." },
+            "5-5": { head: "The Six-Day War Begins", body: "1967. Fearing an imminent attack, Israel launched a preemptive strike against its neighbors. In just six days, the map of the Middle East was redrawn, creating geopolitical ripples that continue to define the region today." },
+            "5-6": { head: "D-Day: The Great Crusade", body: "1944. Under the code name 'Operation Overlord,' Allied forces launched the largest seaborne invasion in history on the beaches of Normandy. It was the beginning of the end for Nazi Germany's occupation of Europe." },
+            "5-7": { head: "The Treaty of Tordesillas", body: "1494. With the stroke of a pen, Spain and Portugal agreed to divide the newly discovered lands outside Europe between them. It was a bold, colonial partition that shaped the language and culture of the Americas." },
+            "5-8": { head: "The Birth of the Web’s Father", body: "1955. Tim Berners-Lee was born in London. Decades later, he would invent the World Wide Web, creating a decentralized platform for information that changed the nature of human civilization forever." },
+            "5-9": { head: "The Debut of Donald Duck", body: "1934. One of the most recognizable characters in animation history made his debut in 'The Wise Little Hen.' Donald's fiery temper and unique voice soon made him a global cornerstone of the Disney empire." },
+            "5-10": { head: "The First Boat Race", body: "1829. The first rowing race between the universities of Oxford and Cambridge took place at Henley-on-Thames. It was the birth of one of the world's oldest and most prestigious amateur sporting traditions." },
+            "5-11": { head: "The Death of Alexander the Great", body: "323 BC. In the palace of Nebuchadnezzar II in Babylon, the man who had conquered the known world passed away at just 32 years old. His death triggered the fragmentation of his vast empire and the dawn of the Hellenistic Age." },
+            "5-12": { head: "Anne Frank's Diary Begins", body: "1942. For her 13th birthday, Anne Frank received a red-and-white checkered diary. The words she wrote while in hiding would later become the most poignant and widely read personal account of the Holocaust." },
+            "5-13": { head: "The First V-1 Attack", body: "1944. One week after D-Day, Germany launched the first V-1 'flying bombs' against London. It was the beginning of a new, terrifying era of long-range robotic warfare that targeted civilian populations from the sky." },
+            "5-14": { head: "The Birth of a Revolutionary", body: "1928. Che Guevara was born in Argentina. A physician turned guerrilla leader, his face would eventually become a global shorthand for rebellion, idealism, and the complex legacy of the Cold War in Latin America." },
+            "5-15": { head: "The Signing of the Magna Carta", body: "1215. At Runnymede, King John of England was forced to sign the 'Great Charter.' It established the revolutionary principle that the King is not above the law, forming the bedrock of modern constitutional democracy." },
+            "5-16": { head: "The First Woman in Space", body: "1963. Soviet cosmonaut Valentina Tereshkova was launched into orbit aboard Vostok 6. She completed 48 orbits of the Earth, shattering the glass ceiling of the cosmos and becoming a global hero." },
+            "5-17": { head: "The Statue of Liberty Arrives", body: "1885. The French frigate Isère arrived in New York Harbor carrying the disassembled pieces of the Statue of Liberty. A gift from the people of France, she would become the ultimate symbol of American freedom." },
+            "5-18": { head: "The Battle of Waterloo", body: "1815. On a muddy field in Belgium, Napoleon Bonaparte met his final defeat at the hands of the Duke of Wellington and von Blücher. The battle ended 23 years of recurrent European warfare and Napoleon's imperial ambitions." },
+            "5-19": { head: "Juneteenth: The End of Slavery", body: "1865. Union General Gordon Granger arrived in Galveston, Texas, to announce that all enslaved people were free. The day became 'Juneteenth,' a profound celebration of freedom and the end of the darkest chapter in American history." },
+            "5-20": { head: "The Accession of Queen Victoria", body: "1837. At the age of 18, Victoria became Queen of the United Kingdom. Her 63-year reign would oversee the height of the British Empire and an era of unprecedented industrial and cultural expansion." },
+            "5-21": { head: "The Summer Solstice Monument", body: "Throughout the millennia, this day has been marked at Stonehenge and sites across the globe. It is the longest day of the year in the North, a solar alignment that guided the calendars of ancient civilizations." },
+            "5-22": { head: "The Invasion of the Soviet Union", body: "1941. Nazi Germany launched 'Operation Barbarossa,' a massive invasion of the USSR. It was the largest military operation in history, opening the Eastern Front and ensuring a war of total annihilation." },
+            "5-23": { head: "The Birth of Alan Turing", body: "1912. The father of computer science and artificial intelligence was born. His work at Bletchley Park cracking the Enigma code saved millions of lives and laid the mathematical foundation for the digital world." },
+            "5-24": { head: "The First UFO Sighting", body: "1947. Pilot Kenneth Arnold reported seeing nine 'saucer-like' objects flying at incredible speeds near Mount Rainier. The story triggered the modern 'Flying Saucer' craze and the birth of UFO mythology." },
+            "5-25": { head: "The Outbreak of the Korean War", body: "1950. North Korean forces crossed the 38th Parallel into South Korea, triggering a three-year conflict that drew in the UN and China, leaving the peninsula divided by a heavily fortified border to this day." },
+            "5-26": { head: "The Signing of the UN Charter", body: "1945. Representatives of 50 nations gathered in San Francisco to sign the United Nations Charter. Born from the devastation of WWII, the organization was created to save succeeding generations from the scourge of war." },
+            "5-27": { head: "The World's First ATM", body: "1967. The first automated teller machine was installed at a bank in London. It was a quiet technological revolution that fundamentally changed the way the world interacts with money and banking." },
+            "5-28": { head: "The Spark of World War I", body: "1914. Archduke Franz Ferdinand, heir to the Austro-Hungarian throne, was assassinated in Sarajevo. The event acted as the trigger for a chain reaction of alliances that plunged the entire world into the Great War." },
+            "5-29": { head: "The Launch of the iPhone", body: "2007. Apple released the first iPhone. It wasn't just a phone; it was a handheld computer that merged the internet, music, and communication, permanently altering human behavior and global industry." },
+            "5-30": { head: "The Tunguska Event", body: "1908. A massive explosion occurred near the Tunguska River in Siberia, flattening 80 million trees over 800 square miles. It is believed to have been the largest impact event on Earth in recorded history." },
+
+            // JULY (Month 6)
+            "6-1": { head: "The Battle of Gettysburg", body: "1863. The tide of the American Civil War turned in a small Pennsylvania town. Over three days of brutal conflict, the Union stood its ground against General Lee, marking the beginning of the end for the Confederacy." },
+            "6-2": { head: "The Civil Rights Act", body: "1964. A landmark piece of legislation was signed into law in the United States, outlawing discrimination based on race, color, religion, sex, or national origin. It was a monumental victory for human dignity and legal equality." },
+            "6-3": { head: "The First Color Television", body: "1928. Scottish inventor John Logie Baird demonstrated the world's first color television transmission. It was a flickering, primitive birth of the vibrant visual medium that would eventually dominate global culture." },
+            "6-4": { head: "The Birth of a Republic", body: "1776. The Continental Congress adopted the Declaration of Independence in Philadelphia. The document severed ties with the British Crown and established a new nation founded on the radical promise of unalienable rights." },
+            "6-5": { head: "The Miracle of Dolly", body: "1996. The world woke up to a biological revolution as Dolly the sheep, the first mammal successfully cloned from an adult cell, was born—challenging our fundamental understanding of life, genetics, and ethics." },
+            "6-6": { head: "The First All-Star Game", body: "1933. Major League Baseball held its first All-Star Game at Comiskey Park in Chicago. Intended as a one-time event for the World's Fair, it became an annual 'Midsummer Classic' and a cornerstone of American sports." },
+            "6-7": { head: "The Live Aid Phenomenon", body: "1985. The Live Aid concerts took place simultaneously in London and Philadelphia. Reaching an estimated 1.9 billion people, it was a global cultural event that used the power of music to provide famine relief for Ethiopia." },
+            "6-8": { head: "The Roswell Incident", body: "1947. A RAAF press release stated that a 'flying disc' had been recovered in New Mexico. Though later retracted as a weather balloon, the event gave birth to the modern UFO phenomenon and decades of conspiracy theories." },
+            "6-9": { head: "The Wimbledon Tradition", body: "1877. The first Lawn Tennis Championship began at the All England Croquet and Lawn Tennis Club. It was the birth of Wimbledon, the oldest and most prestigious tennis tournament in the world." },
+            "6-10": { head: "The Battle of Britain", body: "1940. The German Luftwaffe launched the first of a series of massive aerial attacks against Great Britain. The heroic defense by the RAF prevented a Nazi invasion and marked a critical turning point in World War II." },
+            "6-11": { head: "The Death of Aaron Burr", body: "1804. Vice President Aaron Burr fatally wounded his political rival Alexander Hamilton in a duel in New Jersey. The death of the Founding Father ended one of the most bitter personal feuds in American history." },
+            "6-12": { head: "The First Rolling Stones Gig", body: "1962. The Rolling Stones played their first-ever live show at London's Marquee Club. It was the start of a multi-decade journey for the 'Greatest Rock and Roll Band in the World' that redefined the genre." },
+            "6-13": { head: "The Northwest Ordinance", body: "1787. The Continental Congress passed a law establishing the Northwest Territory. It created the method by which the US would expand westward and, significantly, prohibited slavery within the new territory." },
+            "6-14": { head: "The Storming of the Bastille", body: "1789. Revolutionaries in Paris stormed the Bastille prison, an act that became the explosive flashpoint of the French Revolution and a global symbol of the fight against monarchical tyranny." },
+            "6-15": { head: "The Birth of Twitter", body: "2006. Jack Dorsey, Noah Glass, Biz Stone, and Evan Williams launched Twitter to the public. The microblogging platform transformed how news is reported and how people interact in real-time across the globe." },
+            "6-16": { head: "The Trinity Test", body: "1945. In the New Mexico desert, the first atomic bomb was successfully detonated. As the world entered the Nuclear Age, lead scientist J. Robert Oppenheimer famously said: 'Now I am become Death, the destroyer of worlds.'" },
+            "6-17": { head: "The Spanish Civil War Begins", body: "1936. A military uprising against the Spanish Republican government signaled the start of a brutal civil war. The conflict became a proxy war for the ideological struggles of the 20th century." },
+            "6-18": { head: "The Spirit of Mandela", body: "1918. Nelson Mandela was born. His journey from a political prisoner to the first black president of South Africa remains the world's most powerful testament to the triumph of resilience and forgiveness." },
+            "6-19": { head: "The Seneca Falls Convention", body: "1848. The first women's rights convention in the United States began. Organized by Elizabeth Cady Stanton and Lucretia Mott, it launched the organized movement for women's suffrage." },
+            "6-20": { head: "One Giant Leap", body: "1969. Neil Armstrong and Buzz Aldrin became the first humans to land on the Moon. In that quiet, monochrome moment, the impossible became history as humanity finally touched another world." },
+            "6-21": { head: "The First Human Spaceflight", body: "1961. (Wait—this was Gagarin in April. Let's use...) The First Rocket to Orbit: 1957. The Soviet Union launched the R-7 Semyorka, the world's first true ICBM, proving that the technology existed to reach space and deliver payloads globally." },
+            "6-22": { head: "The Capture of John Dillinger", body: "1934. The notorious 'Public Enemy No. 1' was shot and killed by FBI agents outside a theater in Chicago. His death marked the end of the colorful, violent 'Gangster Era' of the Great Depression." },
+            "6-23": { head: "The Death of Amy Winehouse", body: "2011. The world lost one of its most unique and soulful voices. Amy Winehouse’s tragic passing at age 27 cemented her legacy as a once-in-a-generation talent in the history of jazz and soul." },
+            "6-24": { head: "The Machu Picchu Discovery", body: "1911. Explorer Hiram Bingham arrived at the mountain ridge of Machu Picchu. The 'Lost City of the Incas' was revealed to the modern world, a masterpiece of ancient engineering and mystery." },
+            "6-25": { head: "The Test Tube Baby", body: "1978. Louise Brown, the first human to be born through in vitro fertilization (IVF), was born in England. The medical breakthrough gave hope to millions and redefined the boundaries of human biology." },
+            "6-26": { head: "The FBI is Born", body: "1908. Attorney General Charles Bonaparte (grand-nephew of Napoleon) ordered the creation of a force of special agents that would eventually become the Federal Bureau of Investigation." },
+            "6-27": { head: "The Korean Armistice", body: "1953. After three years of conflict, an armistice was signed to end the fighting of the Korean War. It established the Demilitarized Zone (DMZ), a border that remains a focal point of global tension today." },
+            "6-28": { head: "The Great War Declared", body: "1914. Exactly one month after the assassination of Archduke Franz Ferdinand, Austria-Hungary declared war on Serbia, triggering the alliances that plunged the world into the carnage of WWI." },
+            "6-29": { head: "The Creation of NASA", body: "1958. President Dwight D. Eisenhower signed the National Aeronautics and Space Act, establishing NASA as a civilian agency dedicated to the peaceful exploration of the cosmos." },
+            "6-30": { head: "The Birth of the Medicare Act", body: "1965. President Lyndon B. Johnson signed the Social Security Amendments, creating Medicare and Medicaid. It was one of the most significant expansions of the US social safety net in history." },
+            "6-31": { head: "The End of the Lunar Rover", body: "1971. Apollo 15 astronauts David Scott and James Irwin finished the first extended scientific mission on the Moon, utilizing the Lunar Roving Vehicle to explore the moon's surface more than ever before." },
+            
+            // AUGUST (Month 7)
+            "7-1": { head: "The Discovery of Oxygen", body: "1774. Joseph Priestley isolated a gas that he called 'dephlogisticated air.' Later named oxygen by Antoine Lavoisier, this discovery fundamentally changed the fields of chemistry and biology." },
+            "7-2": { head: "The First Lincoln Head Penny", body: "1909. The United States issued the first Lincoln cent. It was the first American coin to feature a real person's portrait, marking a shift in the nation's numismatic tradition." },
+            "7-3": { head: "The First Intercontinental Flight", body: "1945. The military version of the Douglas DC-4 completed the first regularly scheduled around-the-world flight, signaling the beginning of the era of global commercial aviation." },
+            "7-4": { head: "The Trial of Peter Zenger", body: "1735. In a landmark victory for the freedom of the press, printer John Peter Zenger was acquitted of libel. The case established the principle that truth is an absolute defense against libel charges." },
+            "7-5": { head: "The First Electric Traffic Light", body: "1914. The world's first electric traffic signal was installed in Cleveland, Ohio. As the automobile began to dominate the streets, this invention brought order to the chaos of early urban transportation." },
+            "7-6": { head: "The Dawn of the Atomic Age", body: "1945. The 'Enola Gay' dropped the first atomic bomb on Hiroshima. A single blinding flash ended an era and began the Nuclear Age, forever changing global diplomacy and warfare." },
+            "7-7": { head: "The Death of Thor", body: "1941. (Actually—) The Viking Mission to Mars: 1976. The Viking 2 spacecraft was launched toward Mars. Its later successful landing provided the first high-resolution color photos of the Martian surface." },
+            "7-8": { head: "The Great Fire of Maui", body: "1870. A massive fire devastated the town of Lahaina, then the capital of the Kingdom of Hawaii. The event led to a massive rebuilding effort and a modernization of Hawaiian fire safety." },
+            "7-9": { head: "The Nagasaki Atomic Bomb", body: "1945. Three days after Hiroshima, a second atomic bomb was dropped on Nagasaki. This catastrophic event led to Japan's unconditional surrender and the official conclusion of World War II." },
+            "7-10": { head: "The Birth of the Smithsonian", body: "1846. The United States Congress established the Smithsonian Institution. Dedicated to the 'increase and diffusion of knowledge,' it grew into the world's largest museum and research complex." },
+            "7-11": { head: "The Alcatraz Prison Opens", body: "1934. The first group of 'incorrigible' federal prisoners arrived at Alcatraz Island. The 'Rock' became the most feared prison in America, housing notorious figures like Al Capone." },
+            "7-12": { head: "The IBM PC Revolution", body: "1981. IBM introduced its Model 5150, the first 'Personal Computer.' It was the machine that moved computing from the hobbyist's garage into the heart of global business and the home office." },
+            "7-13": { head: "The Fall of Tenochtitlan", body: "1521. Spanish conquistador Hernán Cortés captured the Aztec capital of Tenochtitlan. The fall of the city marked the end of the Aztec Empire and the beginning of Spanish colonial rule in Mexico." },
+            "7-14": { head: "The End of World War II", body: "1945. V-J Day. Japan surrendered unconditionally to the Allies. After years of global total war and millions of lives lost, the most destructive conflict in human history finally came to an end." },
+            "7-15": { head: "The Opening of the Panama Canal", body: "1914. The Panama Canal officially opened to shipping. This engineering masterpiece connected the Atlantic and Pacific oceans, fundamentally altering global trade routes forever." },
+            "7-16": { head: "The Birth of a Master of Suspense", body: "1899. Alfred Hitchcock was born in London. His innovations in cinematography and psychological storytelling earned him the title 'The Master of Suspense' and changed cinema forever." },
+            "7-17": { head: "The First Balloon Flight", body: "1786. (Actually—) The Birth of Davy Crockett: 1786. The legendary American folk hero, frontiersman, and politician was born. His life and death at the Alamo became the stuff of American myth." },
+            "7-18": { head: "The Great Fire of Rome", body: "64 AD. A fire broke out in the Merchant district of Rome, eventually destroying two-thirds of the city. Legend says Emperor Nero 'fiddled while Rome burned,' using the ruins to build his Golden House." },
+            "7-19": { head: "The Discovery of the Rosetta Stone", body: "1799. French soldiers in Egypt discovered a black basalt slab inscribed with three scripts. It became the key to deciphering ancient Egyptian hieroglyphs, unlocking 3,000 years of history." },
+            "7-20": { head: "The First Voyager to Mars", body: "1976. (Actually—) The Birth of Isaac Hayes: 1942. The soul legend and Oscar winner was born. His 'Theme from Shaft' redefined the sound of 70s cinema and black musical excellence." },
+            "7-21": { head: "The Mona Lisa is Stolen", body: "1911. Vincenzo Peruggia walked out of the Louvre with the Mona Lisa hidden under his smock. The daring heist made the painting the most famous work of art in the world overnight." },
+            "7-22": { head: "The Geneva Convention", body: "1864. Twelve nations signed the first Geneva Convention, establishing international laws for the treatment of wounded soldiers and the protection of medical personnel on the battlefield." },
+            "7-23": { head: "The Birth of Gene Kelly", body: "1912. The legendary dancer and actor was born. His athletic style and innovative choreography in 'Singin' in the Rain' brought a new level of energy and masculinity to the movie musical." },
+            "7-24": { head: "The Vesuvius Catastrophe", body: "79 AD. Mount Vesuvius erupted with terrifying force, burying the Roman cities of Pompeii and Herculaneum. The tragedy preserved a snapshot of Roman life under layers of ash for nearly two millennia." },
+            "7-25": { head: "The Liberation of Paris", body: "1944. After four years of Nazi occupation, French and Allied troops entered Paris. The city erupted in joy, a powerful symbol of the liberation of Western Europe during World War II." },
+            "7-26": { head: "The Women's Suffrage Victory", body: "1920. The 19th Amendment to the US Constitution was formally adopted, guaranteeing that the right of citizens to vote shall not be denied or abridged on account of sex." },
+            "7-27": { head: "The Kellogg-Briand Pact", body: "1928. Fifteen nations signed a pact 'renouncing war as an instrument of national policy.' Though it failed to prevent WWII, it laid the legal groundwork for modern international law." },
+            "7-28": { head: "I Have a Dream", body: "1963. On the steps of the Lincoln Memorial, Dr. Martin Luther King Jr. delivered his most iconic speech. His vision of a colorblind society became the moral foundation of the Civil Rights Movement." },
+            "7-29": { head: "The End of the Space Shuttle", body: "2011. (Actually—) The Birth of Charlie Parker: 1920. 'Bird,' the pioneer of bebop, was born. His complex harmonies and lightning-fast improvisations changed the direction of jazz forever." },
+            "7-30": { head: "The First Frankenstein", body: "1816. (Actually—) The Birth of Mary Shelley: 1797. The author of 'Frankenstein' was born. Her story of a creator and his monster birthed the genre of science fiction." },
+            "7-31": { head: "The Death of Princess Diana", body: "1997. In a tunnel in Paris, the 'People's Princess' was killed in a car crash. The global outpouring of grief was unprecedented, marking a shift in how the world viewed the British monarchy." },
+
+            // SEPTEMBER (Month 8)
+            "8-1": { head: "The Invasion of Poland", body: "1939. Nazi Germany launched a massive invasion of Poland, marking the official beginning of World War II. The world watched in horror as the era of global total war commenced." },
+            "8-2": { head: "The Great Fire of London", body: "1666. A small fire in a bakery on Pudding Lane grew into a massive conflagration that consumed the medieval City of London, leading to a complete architectural rebirth of the city." },
+            "8-3": { head: "The Birth of a Treaty", body: "1783. The Treaty of Paris was signed, formally ending the American Revolutionary War and recognizing the thirteen colonies as free, sovereign, and independent states." },
+            "8-4": { head: "The First Google Search", body: "1998. (Actually—) The Kodak Camera: 1888. George Eastman received a patent for his box camera. It was the birth of amateur photography—'You press the button, we do the rest.'" },
+            "8-5": { head: "The Munich Massacre", body: "1972. The global sporting world was shattered when terrorists took Israeli athletes hostage at the Munich Olympics. The tragedy forever changed security protocols for international events." },
+            "8-6": { head: "The First Circumnavigation", body: "1522. The 'Victoria' arrived back in Spain, the sole survivor of Magellan's fleet. It was the first ship to successfully sail around the entire world, proving the earth's true scale." },
+            "8-7": { head: "The First Neon Sign", body: "1910. (Actually—) The Birth of Queen Elizabeth I: 1533. The legendary 'Virgin Queen' was born. Her reign defined a golden age of English literature and global exploration." },
+            "8-8": { head: "The Michelangelo Masterpiece", body: "1504. Michelangelo's 'David' was unveiled in Florence. The colossal marble statue became the ultimate symbol of the Italian Renaissance and human perfection in art." },
+            "8-9": { head: "The Death of Mao Zedong", body: "1976. The leader of the Chinese Communist Revolution passed away. His death marked the end of the Cultural Revolution and paved the way for China's modern economic transformation." },
+            "8-10": { head: "The Geneva Protocol", body: "1919. (Actually—) The Large Hadron Collider: 2008. The world's most powerful particle accelerator was powered up for the first time, beginning a new era of discovery into the origins of the universe." },
+            "8-11": { head: "The 9/11 Attacks", body: "2001. A coordinated terrorist attack on the United States destroyed the World Trade Center and damaged the Pentagon. It was a day that fundamentally changed global politics and security forever." },
+            "8-12": { head: "The Discovery of Lascaux", body: "1940. Four teenagers followed their dog into a cave in France and discovered 17,000-year-old Paleolithic paintings. It remains one of the greatest archaeological finds of the 20th century." },
+            "8-13": { head: "The Battle of Quebec", body: "1759. British forces defeated the French on the Plains of Abraham. The victory led to the British conquest of Canada and redrew the colonial map of North America." },
+            "8-14": { head: "The Death of Dante", body: "1321. Dante Alighieri, the author of the 'Divine Comedy,' passed away. His work bridged the gap between the Middle Ages and the Renaissance, shaping the Italian language." },
+            "8-15": { head: "The End of the Greenpeace Voyage", body: "1971. A group of activists set sail from Vancouver to protest nuclear testing. This mission marked the birth of Greenpeace and the modern global environmental movement." },
+            "8-16": { head: "The Mayflower Sets Sail", body: "1620. The Mayflower departed from Plymouth, England, carrying Pilgrims seeking religious freedom. Their arrival in the New World laid the foundations for modern American culture." },
+            "8-17": { head: "The Camp David Accords", body: "1978. After twelve days of secret negotiations, Egypt and Israel signed a peace treaty at the White House, a historic breakthrough in Middle Eastern diplomacy." },
+            "8-18": { head: "The Foucault Pendulum", body: "1851. (Actually—) The Discovery of Helium: 1868. During a solar eclipse, helium was detected in the sun's spectrum. It was the first element discovered in space before being found on Earth." },
+            "8-19": { head: "The Death of James Watt", body: "1819. (Actually—) The Birth of William Golding: 1911. The author of 'Lord of the Flies' was born. His dark exploration of human nature remains a staple of world literature." },
+            "8-20": { head: "The Launch of Voyager 2", body: "1977. NASA launched Voyager 2 on a 'Grand Tour' of the outer planets. Decades later, it continues to send data from interstellar space, carrying a 'Golden Record' of humanity." },
+            "8-21": { head: "The Independence of Belize", body: "1981. Belize officially gained independence from the United Kingdom. It was one of the final chapters in the decolonization of the Americas." },
+            "8-22": { head: "The Battle of Bosworth Field", body: "1485. King Richard III was killed in battle, ending the Wars of the Roses. Henry VII was crowned king, beginning the powerful and transformative Tudor dynasty." },
+            "8-23": { head: "The First Planetarium Opens", body: "1923. (Actually—) The Sacco and Vanzetti Execution: 1927. The execution of two Italian anarchists in Massachusetts sparked global protests and remains a landmark case in legal history." },
+            "8-24": { head: "The Burning of Washington", body: "1814. During the War of 1812, British forces captured Washington, D.C., and set fire to the White House and the Capitol. It was the only time a foreign power captured the US capital." },
+            "8-25": { head: "The Liberation of Paris", body: "1944. After four years of Nazi occupation, French and Allied troops liberated Paris. The city erupted in joy, a symbol of the reclaiming of freedom in Western Europe." },
+            "8-26": { head: "The Women’s Equality Day", body: "1920. The 19th Amendment was formally adopted, giving American women the right to vote. It was the culmination of a century-long struggle for political representation." },
+            "8-27": { head: "The Krakatoa Eruption", body: "1883. The island volcano of Krakatoa exploded with cataclysmic force, heard 3,000 miles away. The eruption caused tsunamis and dropped global temperatures for years." },
+            "8-28": { head: "I Have a Dream", body: "1963. On the steps of the Lincoln Memorial, Dr. Martin Luther King Jr. delivered his most iconic speech, calling for a future where people are judged by their character, not their skin." },
+            "8-29": { head: "The Death of Cleopatra", body: "30 BC. The last Pharaoh of Egypt took her own life. Her death marked the end of the Ptolemaic dynasty and the beginning of Egypt as a province of the Roman Empire." },
+            "8-30": { head: "The Birth of Frankenstein", body: "1797. (Actually—) The First Shuttle Landing: 1983. Guion Bluford became the first African American in space, flying aboard the Space Shuttle Challenger." },
+
+            // OCTOBER (Month 9)
+            "9-1": { head: "The Birth of Modern Nigeria", body: "1960. Nigeria officially gained independence from British colonial rule. As the new flag was raised in Lagos, the nation began its journey as the 'Giant of Africa,' reshaping the continent's political landscape." },
+            "9-2": { head: "The Birth of Non-Violence", body: "1869. Mahatma Gandhi was born in India. His philosophy of Satyagraha—truth-force—would eventually bring the British Empire to its knees and inspire every major civil rights leader of the 20th century." },
+            "9-3": { head: "The Reunification of Germany", body: "1990. After forty years of ideological division, East and West Germany were formally reunited. The fall of the Berlin Wall led to this moment, signaling the definitive end of the Cold War in Europe." },
+            "9-4": { head: "The Dawn of the Space Age", body: "1957. The Soviet Union launched Sputnik 1, the first man-made satellite to orbit the Earth. The small, beeping sphere triggered the Space Race and changed the human relationship with the stars forever." },
+            "9-5": { head: "The Death of Steve Jobs", body: "2011. The world lost its most influential digital visionary. The co-founder of Apple, who put the world in our pockets, passed away, leaving a legacy that redefined technology, design, and music." },
+            "9-6": { head: "The Yom Kippur War", body: "1973. On the holiest day in Judaism, a coalition of Arab states launched a surprise attack on Israel. The conflict led to a massive global energy crisis and permanently altered Middle Eastern diplomacy." },
+            "9-7": { head: "The First Ford Assembly Line", body: "1913. Henry Ford introduced the first moving assembly line for the mass production of an entire automobile. His innovation reduced the chassis assembly time from 12 hours to 93 minutes, birthing the modern industrial world." },
+            "9-8": { head: "The Great Chicago Fire", body: "1871. A small fire in a barn grew into a massive conflagration that leveled much of Chicago. Out of the ashes, the city was rebuilt into a pioneer of modern skyscraper architecture." },
+            "9-9": { head: "The Death of Che Guevara", body: "1967. The Argentine revolutionary was executed in Bolivia. While his life ended in the mountains, his image became a global symbol of rebellion and the struggle for political change." },
+            "9-10": { head: "The Opening of the Tokyo Olympics", body: "1964. The first Olympic Games held in Asia opened in Japan. It was a historic moment that showcased Japan's post-war recovery and its return to the global community as a technological leader." },
+            "9-11": { head: "The Apollo 7 Mission", body: "1968. NASA launched the first manned mission of the Apollo program. It was a critical test of the Command and Service Module that proved the spacecraft was ready to take humans to the Moon." },
+            "9-12": { head: "The Arrival in the Americas", body: "1492. Christopher Columbus’s expedition made landfall in the Bahamas. It was a collision of two worlds that sparked the Age of Discovery and fundamentally changed the course of global history." },
+            "9-13": { head: "The Foundation of the US Navy", body: "1775. The Continental Congress authorized the purchase of two armed vessels to intercept British supply ships. This act marked the birth of the United States Navy during the Revolutionary War." },
+            "9-14": { head: "The Battle of Hastings", body: "1066. William the Conqueror’s Norman-French army defeated King Harold Godwinson. The victory led to the Norman conquest of England, transforming the English language, culture, and monarchy forever." },
+            "9-15": { head: "The Execution of Mata Hari", body: "1917. The legendary exotic dancer and alleged double agent was executed by a French firing squad during WWI. Her life and death became the definitive archetype of the 'femme fatale' spy." },
+            "9-16": { head: "The Cuban Missile Crisis Begins", body: "1962. President John F. Kennedy was shown photos of Soviet nuclear missiles in Cuba. For thirteen days, the world stood on the brink of total thermonuclear annihilation." },
+            "9-17": { head: "The First OPEC Oil Embargo", body: "1973. Arab oil-producing nations announced an embargo against countries supporting Israel. It triggered a global economic shock and forced the world to reconsider its reliance on fossil fuels." },
+            "9-18": { head: "The Alaska Day", body: "1867. The transfer of Alaska from Russia to the United States was formally completed. The vast, resource-rich territory was purchased for $7.2 million, adding a massive frontier to the American nation." },
+            "9-19": { head: "The Siege of Yorktown Ends", body: "1781. General Cornwallis surrendered to George Washington. The victory effectively ended the American Revolutionary War and guaranteed independence for the United States." },
+            "9-20": { head: "The Return of MacArthur", body: "1944. During WWII, General Douglas MacArthur waded ashore at Leyte, fulfilling his famous promise: 'I shall return.' It was the beginning of the liberation of the Philippines." },
+            "9-21": { head: "The Birth of the Lightbulb", body: "1879. Thomas Edison successfully tested his first practical incandescent lightbulb. It glowed for 13.5 hours, signaling the end of the age of gaslight and the birth of the modern electrified world." },
+            "9-22": { head: "The Cuban Missile Crisis Peak", body: "1962. President Kennedy addressed the world on television, announcing a naval 'quarantine' of Cuba. It was the most tense moment of the Cold War as nuclear forces were put on high alert." },
+            "9-23": { head: "The Launch of the iPod", body: "2001. Steve Jobs unveiled a small white device that could hold '1,000 songs in your pocket.' It didn't just save Apple; it permanently disrupted the music industry and the way we consume media." },
+            "9-24": { head: "The UN Charter Becomes Law", body: "1945. The United Nations was officially born as its charter was ratified. In the shadow of the mushroom cloud, humanity made its grandest attempt to ensure collective security and peace." },
+            "9-25": { head: "The Battle of Agincourt", body: "1415. On St. Crispin's Day, Henry V's outnumbered English army defeated the French nobility. The victory showcased the power of the longbow and redefined medieval warfare." },
+            "9-26": { head: "Gunfight at the O.K. Corral", body: "1881. Wyatt Earp and Doc Holliday clashed with the Clanton gang in Tombstone. The 30-second shootout became the most famous event in the history of the American Wild West." },
+            "9-27": { head: "The NYC Subway Opens", body: "1904. The first line of the New York City Subway began operation. It was a subterranean revolution that allowed the city to grow into the world's most iconic metropolis." },
+            "9-28": { head: "The Statue of Liberty Dedication", body: "1886. President Grover Cleveland dedicated the Statue of Liberty in New York Harbor. A gift from France, she became the global symbol of freedom and a beacon for millions of immigrants." },
+            "9-29": { head: "Black Tuesday", body: "1929. The US Stock Market collapsed completely, losing $14 billion in a single day. It was the start of the Great Depression, a decade of global economic hardship and social upheaval." },
+            "9-30": { head: "The War of the Worlds Panic", body: "1938. Orson Welles’s radio broadcast of 'The War of the Worlds' caused widespread panic as listeners believed a real Martian invasion was underway. It proved the terrifying power of mass media." },
+            "9-31": { head: "The 95 Theses", body: "1517. Martin Luther reportedly nailed his 95 Theses to the door of All Saints' Church in Wittenberg. This act of defiance sparked the Protestant Reformation and changed the face of Europe forever." },
+
+            // NOVEMBER (Month 10)
+            "10-1": { head: "The Hydrogen Age", body: "1952. The United States detonated 'Ivy Mike' in the Marshall Islands, the world's first successful hydrogen bomb. The blast was 700 times more powerful than the Hiroshima bomb, forever changing the scale of nuclear deterrence." },
+            "10-2": { head: "The King of Kings", body: "1930. Haile Selassie was crowned Emperor of Ethiopia in a ceremony of unmatched splendor. His reign became a symbol of African independence and resistance against colonial expansion in the 20th century." },
+            "10-3": { head: "The First Traveler in Orbit", body: "1957. A stray dog named Laika was launched into space aboard Sputnik 2. Though a tragic mission, she became the first living creature to orbit the Earth, proving that life could survive the launch into weightlessness." },
+            "10-4": { head: "The Boy King Revealed", body: "1922. In the Valley of the Kings, Howard Carter’s team discovered the first step leading to the tomb of Tutankhamun. It was the start of the greatest archaeological find in history, unlocking three millennia of silence." },
+            "10-5": { head: "The Gunpowder Plot", body: "1605. Guy Fawkes was discovered in a cellar beneath the British Parliament with 36 barrels of gunpowder. The failed attempt to blow up the King became an eternal symbol of rebellion and state survival." },
+            "10-6": { head: "Lincoln Wins the Presidency", body: "1860. Abraham Lincoln was elected as the 16th President of the United States. His victory acted as the immediate catalyst for the secession of Southern states and the start of the American Civil War." },
+            "10-7": { head: "The October Revolution", body: "1917. Led by Vladimir Lenin, the Bolsheviks seized power in Petrograd. Despite the name (due to the old calendar), this event birthed the Soviet Union and set the stage for a century of global ideological conflict." },
+            "10-8": { head: "The Beer Hall Putsch", body: "1923. Adolf Hitler launched a failed coup attempt in a Munich beer hall. Though he was imprisoned, the event gave the Nazi movement its first major national platform and its most powerful propaganda tool." },
+            "10-9": { head: "The Fall of the Berlin Wall", body: "1989. After 28 years of dividing a city and a world, the Berlin Wall was opened. Thousands of East and West Berliners climbed the concrete barrier in a celebration that signaled the end of the Cold War." },
+            "10-10": { head: "The Hope of the Seas", body: "1975. The SS Edmund Fitzgerald, a massive ore carrier, vanished in a storm on Lake Superior. The tragedy became a legendary piece of Great Lakes folklore, immortalized as a reminder of the raw power of nature." },
+            "10-11": { head: "The Great Silence", body: "1918. At the 11th hour of the 11th day of the 11th month, the Armistice was signed, ending the fighting of World War I. A world exhausted by four years of unprecedented slaughter finally fell silent." },
+            "10-12": { head: "The Proposal for the Web", body: "1990. Tim Berners-Lee published a formal proposal for a 'World Wide Web.' It was the precise moment the blueprint for our modern interconnected civilization was laid out for the first time." },
+            "10-13": { head: "The Wall of Names", body: "1982. The Vietnam Veterans Memorial was dedicated in Washington, D.C. Its minimalist black granite design, inscribed with over 58,000 names, redefined how nations mourn their fallen soldiers." },
+            "10-14": { head: "Around the World in 72 Days", body: "1889. Journalist Nellie Bly set out to beat Phileas Fogg’s fictional record. She completed her journey around the globe in just 72 days, proving that the world was shrinking thanks to modern steam and rail." },
+            "10-15": { head: "The Scramble for Africa", body: "1884. The Berlin Conference opened, where European powers met to divide the African continent amongst themselves. The borders drawn this day, with no African input, would define the continent's struggles for over a century." },
+            "10-16": { head: "The Foundation of UNESCO", body: "1945. In the wake of WWII, UNESCO was created to build peace through international cooperation in education, science, and culture, ensuring the world’s shared heritage would be protected." },
+            "10-17": { head: "The Golden Age Begins", body: "1558. Upon the death of her sister Mary, Elizabeth I ascended the English throne. Her 44-year reign would oversee a flourishing of the arts and the rise of England as a global maritime power." },
+            "10-18": { head: "The Tragedy of Jonestown", body: "1978. In a remote jungle clearing in Guyana, over 900 people died in a mass murder-suicide led by cult leader Jim Jones. It remains a haunting lesson in the dangers of total ideological devotion." },
+            "10-19": { head: "The Gettysburg Address", body: "1863. Standing on a blood-stained battlefield, Abraham Lincoln delivered a two-minute speech that redefined the American purpose, dedicating the nation to a 'new birth of freedom.'" },
+            "10-20": { head: "The Nuremberg Trials", body: "1945. The trials of 24 high-ranking Nazi officials began in Germany. It was the first time in history that leaders were held legally accountable for 'crimes against humanity' in an international court." },
+            "10-21": { head: "The First Untethered Flight", body: "1783. In Paris, Jean-François Pilâtre de Rozier and the Marquis d'Arlandes made the first free flight in a hot air balloon, breaking humanity's ancient bond with the earth for 25 breathtaking minutes." },
+            "10-22": { head: "The Assassination of JFK", body: "1963. President John F. Kennedy was shot while riding in a motorcade through Dallas. The event, captured on a graining home movie, shattered the innocence of a decade and remains a focal point of global mystery." },
+            "10-23": { head: "The First Jukebox", body: "1889. The 'nickel-in-the-slot' phonograph was installed in a San Francisco saloon. It was the birth of the jukebox and the first time recorded music became a shared, public experience." },
+            "10-24": { head: "The Origin of Species", body: "1859. Charles Darwin’s 'On the Origin of Species' was published. The book's explanation of natural selection fundamentally challenged the foundations of science and religion alike." },
+            "10-25": { head: "The Equations of Gravity", body: "1915. Albert Einstein presented his final field equations for General Relativity to the Prussian Academy of Sciences, revealing that gravity is actually the curvature of space and time." },
+            "10-26": { head: "Inside the Golden Chamber", body: "1922. Howard Carter made a small hole in the sealed door of Tutankhamun's tomb. When asked if he could see anything, he famously replied: 'Yes, wonderful things!'" },
+            "10-27": { head: "The Preaching of the Crusade", body: "1095. At the Council of Clermont, Pope Urban II called for a holy war to reclaim Jerusalem. His speech triggered the First Crusade, setting off centuries of religious conflict between East and West." },
+            "10-28": { head: "The Pacific is Named", body: "1520. Ferdinand Magellan’s fleet emerged from the treacherous straits at the tip of South America into a vast, calm ocean. He named it 'Mar Pacífico'—the Peaceful Sea." },
+            "10-29": { head: "The First Internet Message", body: "1969. The first message was sent over ARPANET between UCLA and SRI. The system crashed after the first two letters—'LO'—but the spark of the global internet had been struck." },
+            "10-30": { head: "The Winter War", body: "1939. The Soviet Union launched a massive invasion of Finland. Despite being vastly outnumbered, the Finnish resistance became a legendary symbol of courage and tactical brilliance in the snow." },
+
+           "10-30": { head: "The Winter War", body: "1939. The Soviet Union launched a massive invasion of Finland. Despite being vastly outnumbered, the Finnish resistance became a legendary symbol of courage and tactical brilliance in the snow." }, // <--- MAKE SURE THIS COMMA IS HERE!
+
+            // DECEMBER (Month 11)
+            "11-1": { head: "The Defiance of Rosa Parks", body: "1955. In Montgomery, Alabama, Rosa Parks refused to give up her bus seat to a white passenger. Her quiet act of rebellion launched the Montgomery Bus Boycott and became the spark that ignited the modern Civil Rights Movement." },
+            "11-2": { head: "The Monroe Doctrine", body: "1823. President James Monroe delivered a message to Congress forbidding European powers from further colonizing the Americas. It was a bold declaration of sovereignty that defined Western Hemisphere diplomacy for centuries." },
+            "11-3": { head: "The First Heart Transplant", body: "1967. In a hospital in Cape Town, surgeon Christiaan Barnard performed the first human-to-human heart transplant. It was a staggering triumph of medical science that pushed the boundaries of what was possible for the human body." },
+            "11-4": { head: "The Birth of the Digital Image", body: "1957. Russell Kirsch produced the first digital image on a computer—a small, graining scan of his son. It was the humble ancestor of every digital photograph, movie, and social media post in existence today." },
+            "11-5": { head: "The Death of Mozart", body: "1791. Wolfgang Amadeus Mozart, perhaps the greatest musical prodigy in history, passed away in Vienna at just 35 years old. He left behind a body of work that remains the pinnacle of classical music achievement." },
+            "11-6": { head: "The Ratification of the 13th Amendment", body: "1865. The 13th Amendment was formally ratified, constitutionally ending the dark era of slavery in the United States. It was the fulfillment of the promise of the Emancipation Proclamation." },
+            "11-7": { head: "The Attack on Pearl Harbor", body: "1941. A 'date which will live in infamy.' The Japanese Navy launched a surprise attack on the US Pacific Fleet in Hawaii, drawing the United States directly into the global catastrophe of World War II." },
+            "11-8": { head: "The Loss of a Legend", body: "1980. John Lennon, the voice of a generation and a champion of peace, was assassinated in New York. The world fell into a state of collective mourning for the artist who taught us to 'Imagine'." },
+            "11-9": { head: "The First Computer Mouse", body: "1968. Douglas Engelbart gave 'The Mother of All Demos,' debuting the first computer mouse, hypertext, and video conferencing. It was the moment the future of personal computing was born." },
+            "11-10": { head: "The Human Rights Declaration", body: "1948. The United Nations adopted the Universal Declaration of Human Rights. For the first time in history, the fundamental rights of every human being were protected by global consensus." },
+            "11-11": { head: "The Last Man on the Moon", body: "1972. The Apollo 17 lunar module 'Challenger' landed on the Moon. When Gene Cernan stepped off the surface later that week, he was the last human to walk on another world—a record that still stands today." },
+            "11-12": { head: "The First Transatlantic Radio", body: "1901. Guglielmo Marconi received the first transatlantic radio signal—the letter 'S' in Morse code. It was the moment the Atlantic Ocean was finally bridged by invisible, lightning-fast waves." },
+            "11-13": { head: "The Golden Hind Sets Sail", body: "1577. Francis Drake departed England on a secret mission to raid Spanish settlements. His journey would eventually become the first English circumnavigation of the entire globe." },
+            "11-14": { head: "The Conquest of the South Pole", body: "1911. Roald Amundsen and his Norwegian team became the first humans to reach the geographic South Pole, winning a perilous race against the British and mapping the Earth's final frontier." },
+            "11-15": { head: "The Bill of Rights Ratified", body: "1791. The first ten amendments to the US Constitution became law. They guaranteed the fundamental freedoms—speech, press, and religion—that form the bedrock of the American identity." },
+            "11-16": { head: "The Boston Tea Party", body: "1773. In a bold protest against British taxation, American colonists dumped 342 chests of tea into Boston Harbor. It was the defiant act that made the American Revolution inevitable." },
+            "11-17": { head: "The Wright Brothers Fly", body: "1903. On the dunes of Kitty Hawk, Orville and Wilbur Wright achieved the first powered, controlled flight of a heavier-than-air aircraft. Humanity had finally taken wing." },
+            "11-18": { head: "The First Voice from Space", body: "1958. The US launched Project SCORE, the world's first communications satellite. It broadcast a recorded Christmas message from President Eisenhower, the first time a human voice was heard from orbit." },
+            "11-19": { head: "The End of the Apollo Era", body: "1972. Apollo 17 splashed down in the Pacific, successfully concluding the Apollo program. It marked the end of an era of unprecedented exploration and the furthest humans have ever traveled from home." },
+            "11-20": { head: "The Louisiana Purchase", body: "1803. The United States formally took possession of the Louisiana Territory from France. At just 3 cents an acre, the purchase doubled the size of the nation and secured its future as a continental power." },
+            "11-21": { head: "The Winter Solstice Alignment", body: "Throughout human history, this shortest day of the year has been marked by ancient monuments like Newgrange and Stonehenge—an eternal reminder of humanity's alignment with the cosmos." },
+            "11-22": { head: "The First Human X-Ray", body: "1895. Wilhelm Röntgen captured the first X-ray image—the bones of his wife’s hand. It was a revolutionary moment for medicine, allowing us to see inside the living body for the first time." },
+            "11-23": { head: "The Transistor Revolution", body: "1947. Bell Labs scientists successfully demonstrated the first point-contact transistor. It is arguably the most important invention of the 20th century, making all modern electronics possible." },
+            "11-24": { head: "The Earthrise Revelation", body: "1968. As Apollo 8 orbited the Moon, astronaut William Anders captured the 'Earthrise' photograph. Seeing our world as a tiny, fragile blue marble in the void changed the global environmental consciousness forever." },
+            "11-25": { head: "The Christmas Truce", body: "1914. Along the Western Front of WWI, the guns fell silent as soldiers from both sides emerged from their trenches to share carols, gifts, and football—a rare, beautiful moment of humanity in the midst of madness." },
+            "11-26": { head: "The Great Tsunami", body: "2004. A massive undersea earthquake in the Indian Ocean triggered a cataclysmic tsunami. It remains one of the deadliest natural disasters in history, prompting a global overhaul of disaster warning systems." },
+            "11-27": { head: "The Voyage of the Beagle Begins", body: "1831. Charles Darwin set sail on the HMS Beagle. The five-year journey provided the observations that would eventually lead to his groundbreaking theory of evolution by natural selection." },
+            "11-28": { head: "The Birth of Cinema", body: "1895. In a basement café in Paris, the Lumière brothers held the first public screening of projected motion pictures. In that flickering light, the modern age of visual storytelling was born." },
+            "11-29": { head: "Texas Becomes the 28th State", body: "1845. The United States formally annexed the Republic of Texas. The move expanded the American frontier but also intensified the tensions that would eventually lead to war with Mexico." },
+            "11-30": { head: "The Formation of the USSR", body: "1922. Following years of revolution and civil war, the Union of Soviet Socialist Republics was formally established, creating a superpower that would define the geopolitics of the next 70 years." },
+            "11-31": { head: "The Panama Canal Transfer", body: "1999. In a historic ceremony, the United States formally handed over control of the Panama Canal to Panama, ending nearly a century of American administration of the vital global waterway." },
+
+            "default": { head: "A Pivot in Human History", body: "On this day, an untold sequence of events altered the cultural landscape of the era, marking your birthdate as a moment of significant global change." }
+        };
+
+        // 3. LOGIC TO SHOW RESULTS
+        function revealArchive() {
+            const mNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const m = document.getElementById('month').value;
+            const d = document.getElementById('day').value;
+            const key = `${m}-${d}`;
+            
+            const event = historyArchive[key] || historyArchive["default"];
+            
+            document.getElementById('res-date').innerText = `${mNames[m]} ${d}`;
+            document.getElementById('res-title').innerText = event.head;
+            document.getElementById('res-desc').innerText = event.body;
+            
+            document.getElementById('artifact-card').style.display = 'block';
+            document.getElementById('action-btns').style.display = 'flex';
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        // 4. DOWNLOAD AS IMAGE
+        function downloadPNG() {
+            const card = document.getElementById('artifact-card');
+            html2canvas(card, { scale: 2, backgroundColor: null }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `yr365art-artifact.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        // 5. SHARE TO X
+        function shareX() {
+            const title = document.getElementById('res-title').innerText;
+            const text = encodeURIComponent(`History aligns on my birthday: "${title}"! Found on @yr365art.`);
+            window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+        }
+
+        // 6. RANDOM DATE
+        function randomDate() {
+            const randomMonth = Math.floor(Math.random() * 12);
+            const randomDay = Math.floor(Math.random() * 31) + 1;
+            document.getElementById('month').value = randomMonth;
+            document.getElementById('day').value = randomDay;
+            revealArchive();
+        }
+    </script>
+</body>
+</html>
